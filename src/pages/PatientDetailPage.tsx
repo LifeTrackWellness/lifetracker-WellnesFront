@@ -34,11 +34,13 @@ export default function PatientDetailPage() {
   const { data: patient, isLoading: patientLoading } = useQuery({
     queryKey: ["patient", patientId],
     queryFn: () => patientService.getById(patientId),
+    enabled: !!id && !isNaN(patientId), 
   });
 
   const { data: clinicalInfo, isLoading: clinicalLoading } = useQuery({
     queryKey: ["clinicalInfo", patientId],
     queryFn: () => clinicalInfoService.get(patientId).catch(() => null),
+    enabled: !!id && !isNaN(patientId), 
   });
 
   const { data: healthHistory = [] } = useQuery({
@@ -50,7 +52,9 @@ export default function PatientDetailPage() {
   const { data: habitPlans = [], isLoading: plansLoading } = useQuery({
     queryKey: ["habitPlans", patientId],
     queryFn: () => habitPlanService.list(patientId),
+    enabled: !!id && !isNaN(patientId),
   });
+
 
   const deactivatePlan = useMutation({
     mutationFn: (planId: number) => habitPlanService.deactivate(patientId, planId),
@@ -70,10 +74,16 @@ export default function PatientDetailPage() {
   });
 
   const togglePlan = (planId: number) => {
-    const next = new Set(expandedPlans);
-    next.has(planId) ? next.delete(planId) : next.add(planId);
-    setExpandedPlans(next);
-  };
+  setExpandedPlans((prev) => {
+    const next = new Set(prev);
+    if (next.has(planId)) {
+      next.delete(planId);
+    } else {
+      next.add(planId);
+    }
+    return next;
+  });
+};
 
   if (patientLoading) {
     return (

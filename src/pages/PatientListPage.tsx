@@ -23,14 +23,10 @@ export default function PatientListPage() {
   const [deactivate, setDeactivate] = useState<{ open: boolean; patientId: number | null }>({ open: false, patientId: null });
 
   const { data: patients = [], isLoading } = useQuery({
-    queryKey: ["patients", "list", search, statusFilter, conditionFilter],
-    queryFn: () =>
-      patientService.search({
-        search: search || undefined,
-        status: statusFilter || undefined,
-        condition: conditionFilter || undefined,
-      }),
-  });
+  queryKey: ["patients", "list", search, statusFilter, conditionFilter],
+  queryFn: () => patientService.listActive(),
+});
+
 
   return (
     <div className="space-y-6">
