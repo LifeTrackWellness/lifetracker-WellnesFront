@@ -29,6 +29,7 @@ export function ClinicalInfoDialog({ open, onOpenChange, patientId, existing }: 
     mainCondition: "",
     secondaryConditions: "",
     healthStatus: "ESTABLE" as HealthStatus,
+    justification: "",
   });
 
   useEffect(() => {
@@ -37,9 +38,15 @@ export function ClinicalInfoDialog({ open, onOpenChange, patientId, existing }: 
         mainCondition: existing.mainCondition,
         secondaryConditions: existing.secondaryConditions,
         healthStatus: existing.healthStatus,
+        justification: existing.justification || "",
       });
     } else {
-      setForm({ mainCondition: "", secondaryConditions: "", healthStatus: "ESTABLE" });
+      setForm({ 
+        mainCondition: "", 
+        secondaryConditions: "", 
+        healthStatus: "ESTABLE",
+        justification: "",
+      });
     }
   }, [existing, open]);
 
@@ -65,15 +72,32 @@ export function ClinicalInfoDialog({ open, onOpenChange, patientId, existing }: 
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
             <Label>Condición Principal</Label>
-            <Input value={form.mainCondition} onChange={(e) => setForm({ ...form, mainCondition: e.target.value })} />
+            <Input 
+              value={form.mainCondition} 
+              onChange={(e) => setForm({ ...form, mainCondition: e.target.value })} 
+            />
           </div>
           <div className="space-y-2">
             <Label>Condiciones Secundarias</Label>
-            <Input value={form.secondaryConditions} onChange={(e) => setForm({ ...form, secondaryConditions: e.target.value })} />
+            <Input 
+              value={form.secondaryConditions} 
+              onChange={(e) => setForm({ ...form, secondaryConditions: e.target.value })} 
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Justificación</Label>
+            <Input 
+              value={form.justification} 
+              onChange={(e) => setForm({ ...form, justification: e.target.value })}
+              placeholder="Justificación del diagnóstico"
+            />
           </div>
           <div className="space-y-2">
             <Label>Estado de Salud</Label>
-            <Select value={form.healthStatus} onValueChange={(v) => setForm({ ...form, healthStatus: v as HealthStatus })}>
+            <Select 
+              value={form.healthStatus} 
+              onValueChange={(v) => setForm({ ...form, healthStatus: v as HealthStatus })}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
