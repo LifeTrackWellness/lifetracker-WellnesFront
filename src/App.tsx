@@ -8,6 +8,7 @@ import PatientListPage from "@/pages/PatientListPage";
 import PatientDetailPage from "@/pages/PatientDetailPage";
 import InactivePatientsPage from "@/pages/InactivePatientsPage";
 import NotFound from "./pages/NotFound.tsx";
+import PlanRulesPage from "@/pages/PlanRulesPage";
 
 const queryClient = new QueryClient();
 
@@ -23,7 +24,9 @@ const App = () => (
             <Route path="/patients" element={<PatientListPage />} />
             <Route path="/patients/inactive" element={<InactivePatientsPage />} />
             <Route path="/patients/:id" element={<PatientDetailPage />} />
+            <Route path="/patients/:id/plans/:planId/rules" element={<PlanRulesPage />} />
             <Route path="*" element={<NotFound />} />
+
           </Routes>
         </AppLayout>
       </BrowserRouter>

@@ -26,6 +26,7 @@ export interface Patient {
   clinicalInfo: ClinicalInfo | null;
 }
 
+
 export interface PatientListDTO {
   id: number;
   name: string;
@@ -62,4 +63,20 @@ export interface HealthStatusHistory {
   newStatus: HealthStatus;
   reason: string;
   changedAt: string;
+}
+
+export interface RuleTemplate {
+  id: number;
+  name: string;
+  description: string;
+  umbralDefault: number;
+  umbralMin: number;
+  umbralMax: number;
+}
+
+export interface PlanRule {
+  id: number;
+  ruleTemplate: RuleTemplate;
+  umbralPersonalizado: number;
+  active: boolean;
 }

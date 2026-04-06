@@ -13,7 +13,7 @@ import { ClinicalInfoDialog } from "@/components/dialogs/ClinicalInfoDialog";
 import { UpdateHealthStatusDialog } from "@/components/dialogs/UpdateHealthStatusDialog";
 import { CreateHabitPlanDialog } from "@/components/dialogs/CreateHabitPlanDialog";
 import { AddTaskDialog } from "@/components/dialogs/AddTaskDialog";
-import { ArrowLeft, Plus, Trash2, XCircle, ChevronDown, ChevronUp, Loader2, Mail, Phone, FileText, Calendar } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, XCircle, ChevronDown, ChevronUp, Loader2, Mail, Phone, FileText, Calendar, Activity } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -149,6 +149,7 @@ export default function PatientDetailPage() {
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={() => setClinicalDialog(true)}>Editar</Button>
                   <Button variant="outline" size="sm" onClick={() => setHealthStatusDialog(true)}>Actualizar Estado</Button>
+                  
                 </div>
 
                 <Collapsible open={historyOpen} onOpenChange={setHistoryOpen}>
@@ -246,6 +247,10 @@ export default function PatientDetailPage() {
                       )}
                       <Button variant="outline" size="sm" onClick={() => setAddTaskDialog({ open: true, planId: plan.id })}>
                         <Plus className="mr-1 h-3.5 w-3.5" /> Agregar Tarea
+                      </Button>
+                      <Button variant="outline" size="sm" 
+                        onClick={() => navigate(`/patients/${patientId}/plans/${plan.id}/rules`)}>
+                        <Activity className="mr-1 h-3.5 w-3.5" /> Ver Reglas
                       </Button>
                     </div>
                     {plan.tasks && plan.tasks.length > 0 ? (
