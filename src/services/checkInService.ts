@@ -1,12 +1,7 @@
 import api from "@/lib/axiosConfig";
 
-export interface EmotionalState {
-  value: string;
-  label: string;
-}
-
 export interface TodayTask {
-  taskId: number;
+  id: number;
   name: string;
   description: string;
 }
@@ -51,20 +46,32 @@ export const BARRIER_LABELS: Record<TaskBarrier, string> = {
 
 export const checkInService = {
   getEmotionalStates: (patientId: number) =>
-    api.get<EmotionalState[]>(`/api/patients/${patientId}/check-in/emotional-states`).then((r) => r.data),
+    api
+      .get<string[]>(`/api/patients/${patientId}/check-in/emotional-states`)
+      .then((r) => r.data),
 
   getTodayTasks: (patientId: number) =>
-    api.get<TodayTask[]>(`/api/patients/${patientId}/check-in/today-tasks`).then((r) => r.data),
+    api
+      .get<TodayTask[]>(`/api/patients/${patientId}/check-in/today-tasks`)
+      .then((r) => r.data),
 
   submit: (patientId: number, payload: CheckInPayload) =>
-    api.post(`/api/patients/${patientId}/check-in`, payload).then((r) => r.data),
+    api
+      .post(`/api/patients/${patientId}/check-in`, payload)
+      .then((r) => r.data),
 
   update: (patientId: number, payload: CheckInPayload) =>
-    api.put(`/api/patients/${patientId}/check-in`, payload).then((r) => r.data),
+    api
+      .put(`/api/patients/${patientId}/check-in`, payload)
+      .then((r) => r.data),
 
   getClosing: (patientId: number) =>
-    api.get<ClosingResponse>(`/api/patients/${patientId}/check-in/closing`).then((r) => r.data),
+    api
+      .get<ClosingResponse>(`/api/patients/${patientId}/check-in/closing`)
+      .then((r) => r.data),
 
   getToday: (patientId: number) =>
-    api.get<TodayCheckIn>(`/api/patients/${patientId}/check-in/today`).then((r) => r.data),
+    api
+      .get<TodayCheckIn>(`/api/patients/${patientId}/check-in/today`)
+      .then((r) => r.data),
 };
