@@ -121,6 +121,7 @@ export default function PatientDetailPage() {
               </Button>
               <StatusBadge status={patient.status} />
             </div>
+          </div>
         </CardHeader>
       </Card>
 
