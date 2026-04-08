@@ -305,7 +305,7 @@ export default function CheckInPage() {
             <>
               <div className="space-y-4">
                 <div className="flex items-center justify-center gap-3">
-                  <Flame className="h-10 w-10 text-orange-500" />
+                  <Flame className="h-10 w-10 text-destructive" />
                   <span className="text-5xl font-extrabold text-foreground">{closing.streak}</span>
                   <span className="text-lg text-muted-foreground font-medium">
                     {closing.streak === 1 ? "día" : "días"}
@@ -338,7 +338,7 @@ export default function CheckInPage() {
       {step === "already-done" && (
         <div className="space-y-6 animate-in fade-in duration-300 text-center py-8">
           <div className="space-y-3">
-            <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto" />
+            <CheckCircle2 className="h-16 w-16 text-primary mx-auto" />
             <h2 className="text-2xl font-bold text-foreground">
               Ya completaste tu registro de hoy
             </h2>
