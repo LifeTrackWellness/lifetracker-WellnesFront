@@ -8,6 +8,7 @@ export interface ClinicalInfo {
   mainCondition: string;
   secondaryConditions: string;
   healthStatus: HealthStatus;
+  justification?: string;
   createdAt: string;
   updatedAt: string;
 }
