@@ -2,6 +2,18 @@ export type PatientStatus = "ACTIVO" | "INACTIVO";
 export type HealthStatus = "CRITICO" | "ESTABLE" | "EN_OBSERVACION" | "LEVE";
 export type PlanStatus = "ACTIVO" | "INACTIVO";
 export type DeactivationReason = "ALTA_MEDICA" | "ABANDONO_PERDIDA_SEGUIMIENTO";
+export type DocumentType = "CEDULA" | "TARJETA_DE_IDENTIDAD";
+
+export interface Guardian {
+  id?: number;
+  name: string;
+  lastName: string;
+  documentType: DocumentType;
+  identityDocument: string;
+  relationship: string;
+  email?: string;
+  phoneNumber?: string;
+}
 
 export interface ClinicalInfo {
   id: number;
@@ -17,6 +29,7 @@ export interface Patient {
   id: number;
   name: string;
   lastName: string;
+  documentType: DocumentType;
   identityDocument: string;
   email: string;
   phoneNumber: string;
@@ -25,6 +38,7 @@ export interface Patient {
   deactivatedAt: string | null;
   createdAt: string;
   clinicalInfo: ClinicalInfo | null;
+  guardian: Guardian | null;
 }
 
 
