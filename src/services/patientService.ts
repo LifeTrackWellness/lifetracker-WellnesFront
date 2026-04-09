@@ -1,8 +1,18 @@
 import api from "@/lib/axiosConfig";
-import type { Patient, PatientListDTO } from "@/types";
+import type { Patient, PatientListDTO, Guardian, DocumentType } from "@/types";
+
+export interface CreatePatientPayload {
+  name: string;
+  lastName: string;
+  documentType: DocumentType;
+  identityDocument: string;
+  email: string;
+  phoneNumber: string;
+  guardian?: Omit<Guardian, "id">;
+}
 
 export const patientService = {
-  create: (data: { name: string; lastName: string; identityDocument: string; email: string; phoneNumber: string }) =>
+  create: (data: CreatePatientPayload) =>
     api.post<Patient>("/api/patients", data).then((r) => r.data),
 
   listActive: () => api.get<Patient[]>("/api/patients").then((r) => r.data),
