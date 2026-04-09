@@ -5,8 +5,9 @@ import {
   checkInService,
   BARRIER_LABELS,
   type TaskBarrier,
-  type TaskResponse,
+  type TodayTask,
   type CheckInPayload,
+  type TaskResponse,
 } from "@/services/checkInService";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -37,13 +38,6 @@ export default function CheckInPage() {
   const [showBarrier, setShowBarrier] = useState(false);
   const [existingCheckIn, setExistingCheckIn] = useState<any>(null);
 
-  // Fetch emotional states
-  const { isLoading: emotionsLoading } = useQuery({
-    queryKey: ["emotionalStates", patientId],
-    queryFn: () => checkInService.getEmotionalStates(patientId),
-    enabled: step === "emotion",
-  });
-
   // Fetch today tasks
   const { data: todayTasks = [], isLoading: tasksLoading } = useQuery({
     queryKey: ["todayTasks", patientId],
@@ -60,29 +54,36 @@ export default function CheckInPage() {
 
   // Submit check-in
   const submitMutation = useMutation({
-    mutationFn: (payload: CheckInPayload) => checkInService.submit(patientId, payload),
+    mutationFn: (payload: CheckInPayload) =>
+      checkInService.submit(patientId, payload),
     onSuccess: () => {
       setStep("closing");
     },
     onError: async (error: any) => {
-      if (error.response?.status === 400) {
+      if (error?.response?.status === 400) {
         try {
           const today = await checkInService.getToday(patientId);
           setExistingCheckIn(today);
-          setStep("already-done");
         } catch {
-          setStep("already-done");
+          // no hay check-in previo
         }
+        setStep("already-done");
+      } else {
+        toast.error("Ocurrió un error al guardar el check-in");
       }
     },
   });
 
   // Update check-in
   const updateMutation = useMutation({
-    mutationFn: (payload: CheckInPayload) => checkInService.update(patientId, payload),
+    mutationFn: (payload: CheckInPayload) =>
+      checkInService.update(patientId, payload),
     onSuccess: () => {
       toast.success("Check-in actualizado");
       setStep("closing");
+    },
+    onError: () => {
+      toast.error("No se pudo actualizar el check-in");
     },
   });
 
@@ -91,10 +92,11 @@ export default function CheckInPage() {
     setStep("tasks");
   };
 
-  const currentTask = todayTasks[currentTaskIndex];
+  const currentTask: TodayTask | undefined = todayTasks[currentTaskIndex];
 
   const handleTaskDone = () => {
-    const response: TaskResponse = { taskId: currentTask.taskId, completed: true };
+    if (!currentTask) return;
+    const response: TaskResponse = { taskId: currentTask.id, completed: true };
     const updated = [...taskResponses, response];
     setTaskResponses(updated);
     setShowBarrier(false);
@@ -106,7 +108,12 @@ export default function CheckInPage() {
   };
 
   const handleBarrierSelect = (barrier: TaskBarrier) => {
-    const response: TaskResponse = { taskId: currentTask.taskId, completed: false, barrier };
+    if (!currentTask) return;
+    const response: TaskResponse = {
+      taskId: currentTask.id,
+      completed: false,
+      barrier,
+    };
     const updated = [...taskResponses, response];
     setTaskResponses(updated);
     setShowBarrier(false);
@@ -126,60 +133,78 @@ export default function CheckInPage() {
   };
 
   const handleEditCheckIn = () => {
-    setStep("emotion");
-    setSelectedEmotion(existingCheckIn?.emotionalState || null);
+    setSelectedEmotion(existingCheckIn?.emotionalState ?? null);
     setCurrentTaskIndex(0);
     setTaskResponses([]);
     setShowBarrier(false);
+    setStep("emotion");
+  };
+
+  const handleUpdateSubmit = () => {
+    const payload: CheckInPayload = {
+      emotionalState: selectedEmotion!,
+      tasks: taskResponses,
+    };
+    updateMutation.mutate(payload);
   };
 
   if (!id || isNaN(patientId)) {
-    return <p className="text-center py-20 text-muted-foreground">Paciente no válido</p>;
+    return (
+      <p className="text-center py-20 text-muted-foreground">
+        Paciente no válido
+      </p>
+    );
   }
 
   return (
     <div className="max-w-lg mx-auto py-6 px-4 space-y-6">
-      <Button variant="ghost" onClick={() => navigate(`/patients/${patientId}`)} className="gap-2">
+      <Button
+        variant="ghost"
+        onClick={() => navigate(`/patients/${patientId}`)}
+        className="gap-2"
+      >
         <ArrowLeft className="h-4 w-4" /> Volver al paciente
       </Button>
 
-      {/* STEP 1: Emotion */}
+      {/* PASO 1: Estado emocional */}
       {step === "emotion" && (
         <div className="space-y-6 animate-in fade-in duration-300">
           <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold text-foreground">¿Cómo te sientes hoy?</h2>
-            <p className="text-muted-foreground">Selecciona el estado que mejor te represente</p>
+            <h2 className="text-2xl font-bold text-foreground">
+              ¿Cómo te sientes hoy?
+            </h2>
+            <p className="text-muted-foreground">
+              Selecciona el estado que mejor te represente
+            </p>
           </div>
 
-          {emotionsLoading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : (
-            <div className="grid grid-cols-5 gap-3">
-              {Object.entries(EMOTION_MAP).map(([key, { emoji, label }]) => (
-                <button
-                  key={key}
-                  onClick={() => setSelectedEmotion(key)}
+          <div className="grid grid-cols-5 gap-3">
+            {Object.entries(EMOTION_MAP).map(([key, { emoji, label }]) => (
+              <button
+                key={key}
+                onClick={() => setSelectedEmotion(key)}
+                className={cn(
+                  "flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200",
+                  "hover:scale-105 hover:shadow-md",
+                  selectedEmotion === key
+                    ? "border-primary bg-primary/10 shadow-lg scale-105"
+                    : "border-border bg-card hover:border-primary/40"
+                )}
+              >
+                <span className="text-4xl md:text-5xl">{emoji}</span>
+                <span
                   className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200",
-                    "hover:scale-105 hover:shadow-md",
+                    "text-xs font-medium",
                     selectedEmotion === key
-                      ? "border-primary bg-primary/10 shadow-lg scale-105"
-                      : "border-border bg-card hover:border-primary/40"
+                      ? "text-primary"
+                      : "text-muted-foreground"
                   )}
                 >
-                  <span className="text-4xl md:text-5xl">{emoji}</span>
-                  <span className={cn(
-                    "text-xs font-medium",
-                    selectedEmotion === key ? "text-primary" : "text-muted-foreground"
-                  )}>
-                    {label}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
+                  {label}
+                </span>
+              </button>
+            ))}
+          </div>
 
           <Button
             onClick={handleEmotionNext}
@@ -192,16 +217,18 @@ export default function CheckInPage() {
         </div>
       )}
 
-      {/* STEP 2: Tasks */}
+      {/* PASO 2: Tareas */}
       {step === "tasks" && (
         <div className="space-y-6 animate-in fade-in duration-300">
           <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold text-foreground">Tus tareas de hoy</h2>
+            <h2 className="text-2xl font-bold text-foreground">
+              Tus tareas de hoy
+            </h2>
             <p className="text-muted-foreground">
               Tarea {currentTaskIndex + 1} de {todayTasks.length}
             </p>
             <Progress
-              value={((currentTaskIndex) / Math.max(todayTasks.length, 1)) * 100}
+              value={(currentTaskIndex / Math.max(todayTasks.length, 1)) * 100}
               className="h-2"
             />
           </div>
@@ -213,14 +240,18 @@ export default function CheckInPage() {
           ) : todayTasks.length === 0 ? (
             <Card>
               <CardContent className="pt-6 text-center space-y-4">
-                <p className="text-muted-foreground text-lg">No tienes tareas asignadas hoy.</p>
-                <Button onClick={() => {
-                  const payload: CheckInPayload = {
-                    emotionalState: selectedEmotion!,
-                    tasks: [],
-                  };
-                  submitMutation.mutate(payload);
-                }}>
+                <p className="text-muted-foreground text-lg">
+                  No tienes tareas asignadas hoy.
+                </p>
+                <Button
+                  onClick={() => {
+                    const payload: CheckInPayload = {
+                      emotionalState: selectedEmotion!,
+                      tasks: [],
+                    };
+                    submitMutation.mutate(payload);
+                  }}
+                >
                   Completar check-in
                 </Button>
               </CardContent>
@@ -229,9 +260,13 @@ export default function CheckInPage() {
             <Card className="overflow-hidden">
               <CardContent className="pt-8 pb-8 space-y-6">
                 <div className="text-center space-y-2">
-                  <h3 className="text-xl font-bold text-foreground">{currentTask.name}</h3>
+                  <h3 className="text-xl font-bold text-foreground">
+                    {currentTask.name}
+                  </h3>
                   {currentTask.description && (
-                    <p className="text-muted-foreground">{currentTask.description}</p>
+                    <p className="text-muted-foreground">
+                      {currentTask.description}
+                    </p>
                   )}
                 </div>
 
@@ -242,7 +277,7 @@ export default function CheckInPage() {
                       className="w-full h-14 text-lg gap-2"
                       size="lg"
                     >
-                      <CheckCircle2 className="h-5 w-5" /> Lo hice ✅
+                      <CheckCircle2 className="h-5 w-5" /> Lo hice 
                     </Button>
                     <Button
                       onClick={handleTaskNotDone}
@@ -259,15 +294,15 @@ export default function CheckInPage() {
                       ¿Qué te impidió hacerlo?
                     </p>
                     <div className="grid gap-2">
-                      {(Object.entries(BARRIER_LABELS) as [TaskBarrier, string][]).map(
-                        ([value, label]) => (
+                      {(Object.keys(BARRIER_LABELS) as TaskBarrier[]).map(
+                        (value) => (
                           <Button
                             key={value}
                             variant="outline"
                             className="w-full h-11 justify-start text-left"
                             onClick={() => handleBarrierSelect(value)}
                           >
-                            {label}
+                            {BARRIER_LABELS[value]}
                           </Button>
                         )
                       )}
@@ -294,7 +329,7 @@ export default function CheckInPage() {
         </div>
       )}
 
-      {/* STEP 3: Closing */}
+      {/* PASO 3: Cierre */}
       {step === "closing" && (
         <div className="space-y-8 animate-in fade-in duration-500 text-center py-8">
           {closingLoading ? (
@@ -306,12 +341,14 @@ export default function CheckInPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-center gap-3">
                   <Flame className="h-10 w-10 text-destructive" />
-                  <span className="text-5xl font-extrabold text-foreground">{closing.streak}</span>
+                  <span className="text-5xl font-extrabold text-foreground">
+                    {closing.streak}
+                  </span>
                   <span className="text-lg text-muted-foreground font-medium">
                     {closing.streak === 1 ? "día" : "días"}
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground">Racha actual 🔥</p>
+                <p className="text-sm text-muted-foreground">Racha actual </p>
               </div>
 
               <Card className="bg-primary/5 border-primary/20">
@@ -334,7 +371,7 @@ export default function CheckInPage() {
         </div>
       )}
 
-      {/* Already done today */}
+      {/* Ya hizo check-in hoy */}
       {step === "already-done" && (
         <div className="space-y-6 animate-in fade-in duration-300 text-center py-8">
           <div className="space-y-3">
@@ -347,7 +384,8 @@ export default function CheckInPage() {
                 <p>
                   Estado emocional:{" "}
                   <span className="text-2xl">
-                    {EMOTION_MAP[existingCheckIn.emotionalState]?.emoji || existingCheckIn.emotionalState}
+                    {EMOTION_MAP[existingCheckIn.emotionalState]?.emoji ??
+                      existingCheckIn.emotionalState}
                   </span>{" "}
                   {EMOTION_MAP[existingCheckIn.emotionalState]?.label}
                 </p>
@@ -371,6 +409,22 @@ export default function CheckInPage() {
             </Button>
           </div>
         </div>
+      )}
+
+      {/* Botón de guardar edición cuando viene de already-done */}
+      {step === "tasks" && existingCheckIn && (
+        <Button
+          onClick={handleUpdateSubmit}
+          disabled={updateMutation.isPending}
+          variant="outline"
+          className="w-full"
+        >
+          {updateMutation.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            "Guardar cambios"
+          )}
+        </Button>
       )}
     </div>
   );
