@@ -113,7 +113,6 @@ export const checkInService = {
       .get<CheckInDetail>(`/api/patients/${patientId}/check-in/${checkInId}/detail`)
       .then((r) => r.data),
 };
-export const checkInService = {
   getEmotionalStates: (patientId: number) =>
     api
       .get<string[]>(`/api/patients/${patientId}/check-in/emotional-states`)
