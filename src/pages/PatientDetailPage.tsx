@@ -13,7 +13,7 @@ import { ClinicalInfoDialog } from "@/components/dialogs/ClinicalInfoDialog";
 import { UpdateHealthStatusDialog } from "@/components/dialogs/UpdateHealthStatusDialog";
 import { CreateHabitPlanDialog } from "@/components/dialogs/CreateHabitPlanDialog";
 import { AddTaskDialog } from "@/components/dialogs/AddTaskDialog";
-import { ArrowLeft, Plus, Trash2, XCircle, ChevronDown, ChevronUp, Loader2, Mail, Phone, FileText, Calendar, Activity, ClipboardCheck } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, XCircle, ChevronDown, ChevronUp, Loader2, Mail, Phone, FileText, Calendar, Activity, ClipboardCheck, History } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -118,6 +118,9 @@ export default function PatientDetailPage() {
             <div className="flex items-center gap-3">
               <Button onClick={() => navigate(`/patients/${patientId}/check-in`)} className="gap-2">
                 <ClipboardCheck className="h-4 w-4" /> Check-in Diario
+              </Button>
+              <Button variant="outline" onClick={() => navigate(`/patients/${patientId}/check-in/history`)} className="gap-2">
+                <History className="h-4 w-4" /> Historial
               </Button>
               <StatusBadge status={patient.status} />
             </div>
