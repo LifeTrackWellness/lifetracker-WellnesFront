@@ -113,33 +113,3 @@ export const checkInService = {
       .get<CheckInDetail>(`/api/patients/${patientId}/check-in/${checkInId}/detail`)
       .then((r) => r.data),
 };
-  getEmotionalStates: (patientId: number) =>
-    api
-      .get<string[]>(`/api/patients/${patientId}/check-in/emotional-states`)
-      .then((r) => r.data),
-
-  getTodayTasks: (patientId: number) =>
-    api
-      .get<TodayTask[]>(`/api/patients/${patientId}/check-in/today-tasks`)
-      .then((r) => r.data),
-
-  submit: (patientId: number, payload: CheckInPayload) =>
-    api
-      .post(`/api/patients/${patientId}/check-in`, payload)
-      .then((r) => r.data),
-
-  update: (patientId: number, payload: CheckInPayload) =>
-    api
-      .put(`/api/patients/${patientId}/check-in`, payload)
-      .then((r) => r.data),
-
-  getClosing: (patientId: number) =>
-    api
-      .get<ClosingResponse>(`/api/patients/${patientId}/check-in/closing`)
-      .then((r) => r.data),
-
-  getToday: (patientId: number) =>
-    api
-      .get<TodayCheckIn>(`/api/patients/${patientId}/check-in/today`)
-      .then((r) => r.data),
-};
