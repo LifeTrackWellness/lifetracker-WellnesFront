@@ -95,3 +95,27 @@ export interface PlanRule {
   umbralPersonalizado: number;
   active: boolean;
 }
+
+export type RiskLevel = "VERDE" | "AMARILLO" | "ROJO";
+
+export interface RiskLevelInfo {
+  patientId: number;
+  patientName: string;
+  riskLevel: RiskLevel;
+  riskLevelDisplay: string;
+  riskLevelDescription: string;
+  compliancePercentage: number;
+  evaluatedDate: string;
+  createdAt: string;
+}
+
+export interface RiskLevelHistoryEntry {
+  id: number;
+  riskLevel: RiskLevel;
+  riskLevelDisplay: string;
+  previousRiskLevel: RiskLevel | null;
+  previousRiskLevelDisplay: string | null;
+  compliancePercentage: number;
+  evaluatedDate: string;
+  createdAt: string;
+}
