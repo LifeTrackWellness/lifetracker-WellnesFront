@@ -1,4 +1,4 @@
-import { Users, UserX, Activity } from "lucide-react";
+import { Users, UserX, Activity, ShieldAlert } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -17,6 +17,7 @@ import {
 const navItems = [
   { title: "Pacientes", url: "/patients", icon: Users },
   { title: "Pacientes Inactivos", url: "/patients/inactive", icon: UserX },
+  { title: "Panel de Riesgo", url: "/risk-level", icon: ShieldAlert },
 ];
 
 export function AppSidebar() {
