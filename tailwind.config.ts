@@ -65,6 +65,11 @@ export default {
           observation: "hsl(var(--status-observation))",
           mild: "hsl(var(--status-mild))",
         },
+        risk: {
+          green: "hsl(var(--risk-green))",
+          yellow: "hsl(var(--risk-yellow))",
+          red: "hsl(var(--risk-red))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

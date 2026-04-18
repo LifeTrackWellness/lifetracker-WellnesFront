@@ -29,6 +29,7 @@ export interface Patient {
   id: number;
   name: string;
   lastName: string;
+  documentType: DocumentType;
   identityDocument: string;
   email: string;
   phoneNumber: string;
@@ -37,6 +38,7 @@ export interface Patient {
   deactivatedAt: string | null;
   createdAt: string;
   clinicalInfo: ClinicalInfo | null;
+  guardian: Guardian | null;
 }
 
 
@@ -92,4 +94,28 @@ export interface PlanRule {
   ruleTemplate: RuleTemplate;
   umbralPersonalizado: number;
   active: boolean;
+}
+
+export type RiskLevel = "VERDE" | "AMARILLO" | "ROJO";
+
+export interface RiskLevelInfo {
+  patientId: number;
+  patientName: string;
+  riskLevel: RiskLevel;
+  riskLevelDisplay: string;
+  riskLevelDescription: string;
+  compliancePercentage: number;
+  evaluatedDate: string;
+  createdAt: string;
+}
+
+export interface RiskLevelHistoryEntry {
+  id: number;
+  riskLevel: RiskLevel;
+  riskLevelDisplay: string;
+  previousRiskLevel: RiskLevel | null;
+  previousRiskLevelDisplay: string | null;
+  compliancePercentage: number;
+  evaluatedDate: string;
+  createdAt: string;
 }

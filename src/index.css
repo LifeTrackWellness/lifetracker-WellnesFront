@@ -53,6 +53,10 @@ All colors MUST be HSL.
     --status-stable: 142 71% 45%;
     --status-observation: 45 93% 47%;
     --status-mild: 213 94% 56%;
+
+    --risk-green: 142 71% 45%;
+    --risk-yellow: 45 93% 47%;
+    --risk-red: 0 72% 51%;
   }
 
   .dark {
@@ -91,6 +95,34 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer components {
+  .checkin-day {
+    @apply relative flex h-16 w-full flex-col items-center justify-center rounded-xl border border-transparent bg-card text-foreground transition-colors;
+  }
+
+  .checkin-day-completed {
+    background-color: hsl(var(--status-active) / 0.14);
+    color: hsl(var(--status-active));
+  }
+
+  .checkin-day-missing {
+    @apply bg-muted text-muted-foreground;
+  }
+
+  .checkin-day-outside {
+    @apply opacity-30;
+  }
+
+  .checkin-day-today {
+    box-shadow: 0 0 0 2px hsl(var(--ring));
+  }
+
+  .checkin-badge-completed {
+    background-color: hsl(var(--status-active));
+    color: hsl(var(--primary-foreground));
   }
 }
 

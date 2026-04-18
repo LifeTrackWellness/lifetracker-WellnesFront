@@ -17,6 +17,7 @@ import { ArrowLeft, Plus, Trash2, XCircle, ChevronDown, ChevronUp, Loader2, Mail
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { RiskLevelSection } from "@/components/risk-level/RiskLevelSection";
 
 export default function PatientDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -127,6 +128,8 @@ export default function PatientDetailPage() {
           </div>
         </CardHeader>
       </Card>
+
+      <RiskLevelSection patientId={patientId} />
 
       <Tabs defaultValue="clinical">
         <TabsList>
