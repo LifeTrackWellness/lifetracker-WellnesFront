@@ -12,7 +12,7 @@ export interface CreatePatientPayload {
 }
 
 export const patientService = {
-  create: (data: { name: string; lastName: string; identityDocument: string; email: string; phoneNumber: string }) =>
+  create: (data: CreatePatientPayload) =>
     api.post<Patient>("/api/patients", data).then((r) => r.data),
 
   listActive: () => api.get<Patient[]>("/api/patients").then((r) => r.data),
