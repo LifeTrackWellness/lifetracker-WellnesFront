@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound.tsx";
 import PlanRulesPage from "@/pages/PlanRulesPage";
 import CheckInPage from "@/pages/CheckInPage";
 import CheckInHistoryPage from "@/pages/CheckInHistoryPage";
+import RiskLevelPanelPage from "@/pages/RiskLevelPanelPage";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/patients/:id/plans/:planId/rules" element={<PlanRulesPage />} />
             <Route path="/patients/:id/check-in" element={<CheckInPage />} />
             <Route path="/patients/:id/check-in/history" element={<CheckInHistoryPage />} />
+            <Route path="/risk-level" element={<RiskLevelPanelPage />} />
             <Route path="*" element={<NotFound />} />
 
           </Routes>
