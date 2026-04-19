@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { RiskLevelSection } from "@/components/risk-level/RiskLevelSection";
+import { consentService } from "@/services/consentService";
 
 export default function PatientDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -73,6 +74,20 @@ export default function PatientDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["habitPlans", patientId] });
     },
   });
+
+  const acceptConsent = useMutation({
+  mutationFn: (consentId: number) => consentService.accept(patientId, consentId),
+  onSuccess: () => {
+    toast.success("Consentimiento aceptado");
+    queryClient.invalidateQueries({ queryKey: ["consents", patientId] });
+  },
+});
+
+  const { data: consents = [], isLoading: consentsLoading } = useQuery({
+  queryKey: ["consents", patientId],
+  queryFn: () => consentService.getByPatient(patientId),
+  enabled: !!id && !isNaN(patientId),
+});
 
   const togglePlan = (planId: number) => {
   setExpandedPlans((prev) => {
@@ -135,6 +150,8 @@ export default function PatientDetailPage() {
         <TabsList>
           <TabsTrigger value="clinical">Información Clínica</TabsTrigger>
           <TabsTrigger value="habits">Planes de Hábitos</TabsTrigger>
+          <TabsTrigger value="consents">Consentimientos</TabsTrigger>
+
         </TabsList>
 
         <TabsContent value="clinical" className="space-y-4 mt-4">
@@ -308,6 +325,56 @@ export default function PatientDetailPage() {
             planId={addTaskDialog.planId}
           />
         </TabsContent>
+        <TabsContent value="consents" className="space-y-4 mt-4">
+  {consentsLoading ? (
+    <div className="flex justify-center py-8">
+      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+    </div>
+  ) : consents.length === 0 ? (
+    <Card>
+      <CardContent className="pt-6 text-center text-muted-foreground">
+        No hay consentimientos registrados.
+      </CardContent>
+    </Card>
+  ) : (
+    consents.map((consent) => (
+      <Card key={consent.id}>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-base">
+                {consent.consentTemplate.titulo}
+              </CardTitle>
+              <p className="text-xs text-muted-foreground mt-1">
+                Versión {consent.consentTemplate.version}
+              </p>
+            </div>
+            {consent.aceptado ? (
+              <span className="text-sm text-green-600 font-medium">
+                ✅ Aceptado — {consent.fechaAceptacion
+                  ? format(new Date(consent.fechaAceptacion), "dd/MM/yyyy HH:mm")
+                  : ""}
+              </span>
+            ) : (
+              <Button
+                size="sm"
+                onClick={() => acceptConsent.mutate(consent.id)}
+                disabled={acceptConsent.isPending}
+              >
+                Aceptar
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            {consent.consentTemplate.contenido}
+          </p>
+        </CardContent>
+      </Card>
+    ))
+  )}
+</TabsContent>
       </Tabs>
     </div>
   );
