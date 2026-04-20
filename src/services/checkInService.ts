@@ -4,6 +4,10 @@ export interface TodayTask {
   id: number;
   name: string;
   description: string;
+  priority: "ALTA" | "MEDIA" | "BAJA";
+  mandatory: boolean;
+  weeklyGoal: number | null;
+  specificDays: string[];
 }
 
 export interface TaskResponse {
@@ -112,4 +116,9 @@ export const checkInService = {
     api
       .get<CheckInDetail>(`/api/patients/${patientId}/check-in/${checkInId}/detail`)
       .then((r) => r.data),
+
+  getTasksForToday: (patientId: number) =>
+  api
+    .get<TodayTask[]>(`/api/patients/${patientId}/habit-plans/tasks/today`)
+    .then((r) => r.data),
 };
