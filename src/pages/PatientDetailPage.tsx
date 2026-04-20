@@ -150,6 +150,10 @@ export default function PatientDetailPage() {
               <Button variant="outline" onClick={() => navigate(`/patients/${patientId}/check-in/history`)} className="gap-2">
                 <History className="h-4 w-4" /> Historial
               </Button>
+               <Button variant="outline" onClick={() => navigate(`/patients/${patientId}/adherence`)} className="gap-2">
+                  <Activity className="h-4 w-4" /> Métricas
+                </Button>
+              
               <StatusBadge status={patient.status} />
             </div>
           </div>

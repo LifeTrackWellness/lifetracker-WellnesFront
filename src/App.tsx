@@ -12,6 +12,7 @@ import PlanRulesPage from "@/pages/PlanRulesPage";
 import CheckInPage from "@/pages/CheckInPage";
 import CheckInHistoryPage from "@/pages/CheckInHistoryPage";
 import RiskLevelPanelPage from "@/pages/RiskLevelPanelPage";
+import AdherencePage from "@/pages/AdherencePage";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/patients/:id/check-in/history" element={<CheckInHistoryPage />} />
             <Route path="/risk-level" element={<RiskLevelPanelPage />} />
             <Route path="*" element={<NotFound />} />
+            <Route path="/patients/:id/adherence" element={<AdherencePage />} />
 
           </Routes>
         </AppLayout>
