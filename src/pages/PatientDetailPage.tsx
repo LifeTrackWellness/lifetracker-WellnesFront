@@ -18,6 +18,8 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { RiskLevelSection } from "@/components/risk-level/RiskLevelSection";
+import { consentService } from "@/services/consentService";
+import { checkInService } from "@/services/checkInService";
 
 export default function PatientDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -35,13 +37,13 @@ export default function PatientDetailPage() {
   const { data: patient, isLoading: patientLoading } = useQuery({
     queryKey: ["patient", patientId],
     queryFn: () => patientService.getById(patientId),
-    enabled: !!id && !isNaN(patientId), 
+    enabled: !!id && !isNaN(patientId),
   });
 
   const { data: clinicalInfo, isLoading: clinicalLoading } = useQuery({
     queryKey: ["clinicalInfo", patientId],
     queryFn: () => clinicalInfoService.get(patientId).catch(() => null),
-    enabled: !!id && !isNaN(patientId), 
+    enabled: !!id && !isNaN(patientId),
   });
 
   const { data: healthHistory = [] } = useQuery({
@@ -56,6 +58,23 @@ export default function PatientDetailPage() {
     enabled: !!id && !isNaN(patientId),
   });
 
+  const { data: consents = [], isLoading: consentsLoading } = useQuery({
+    queryKey: ["consents", patientId],
+    queryFn: () => consentService.getByPatient(patientId),
+    enabled: !!id && !isNaN(patientId),
+  });
+
+  const { data: todayTasks = [], isLoading: tasksLoading } = useQuery({
+    queryKey: ["todayTasks", patientId],
+    queryFn: () => checkInService.getTasksForToday(patientId),
+    enabled: !!id && !isNaN(patientId),
+  });
+
+  const { data: todayCheckIn } = useQuery({
+    queryKey: ["todayCheckIn", patientId],
+    queryFn: () => checkInService.getToday(patientId).catch(() => null),
+    enabled: !!id && !isNaN(patientId),
+  });
 
   const deactivatePlan = useMutation({
     mutationFn: (planId: number) => habitPlanService.deactivate(patientId, planId),
@@ -74,17 +93,25 @@ export default function PatientDetailPage() {
     },
   });
 
-  const togglePlan = (planId: number) => {
-  setExpandedPlans((prev) => {
-    const next = new Set(prev);
-    if (next.has(planId)) {
-      next.delete(planId);
-    } else {
-      next.add(planId);
-    }
-    return next;
+  const acceptConsent = useMutation({
+    mutationFn: (consentId: number) => consentService.accept(patientId, consentId),
+    onSuccess: () => {
+      toast.success("Consentimiento aceptado");
+      queryClient.invalidateQueries({ queryKey: ["consents", patientId] });
+    },
   });
-};
+
+  const togglePlan = (planId: number) => {
+    setExpandedPlans((prev) => {
+      const next = new Set(prev);
+      if (next.has(planId)) {
+        next.delete(planId);
+      } else {
+        next.add(planId);
+      }
+      return next;
+    });
+  };
 
   if (patientLoading) {
     return (
@@ -123,6 +150,10 @@ export default function PatientDetailPage() {
               <Button variant="outline" onClick={() => navigate(`/patients/${patientId}/check-in/history`)} className="gap-2">
                 <History className="h-4 w-4" /> Historial
               </Button>
+               <Button variant="outline" onClick={() => navigate(`/patients/${patientId}/adherence`)} className="gap-2">
+                  <Activity className="h-4 w-4" /> Métricas
+                </Button>
+              
               <StatusBadge status={patient.status} />
             </div>
           </div>
@@ -135,8 +166,11 @@ export default function PatientDetailPage() {
         <TabsList>
           <TabsTrigger value="clinical">Información Clínica</TabsTrigger>
           <TabsTrigger value="habits">Planes de Hábitos</TabsTrigger>
+          <TabsTrigger value="consents">Consentimientos</TabsTrigger>
+          <TabsTrigger value="today-tasks">Tareas de Hoy</TabsTrigger>
         </TabsList>
 
+        {/* ── Información Clínica ── */}
         <TabsContent value="clinical" className="space-y-4 mt-4">
           {clinicalLoading ? (
             <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
@@ -160,9 +194,7 @@ export default function PatientDetailPage() {
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={() => setClinicalDialog(true)}>Editar</Button>
                   <Button variant="outline" size="sm" onClick={() => setHealthStatusDialog(true)}>Actualizar Estado</Button>
-                  
                 </div>
-
                 <Collapsible open={historyOpen} onOpenChange={setHistoryOpen}>
                   <CollapsibleTrigger asChild>
                     <Button variant="ghost" size="sm" className="gap-1">
@@ -209,11 +241,11 @@ export default function PatientDetailPage() {
               </CardContent>
             </Card>
           )}
-
           <ClinicalInfoDialog open={clinicalDialog} onOpenChange={setClinicalDialog} patientId={patientId} existing={clinicalInfo ?? null} />
           <UpdateHealthStatusDialog open={healthStatusDialog} onOpenChange={setHealthStatusDialog} patientId={patientId} />
         </TabsContent>
 
+        {/* ── Planes de Hábitos ── */}
         <TabsContent value="habits" className="space-y-4 mt-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold">Planes de Hábitos</h3>
@@ -221,7 +253,6 @@ export default function PatientDetailPage() {
               <Plus className="mr-2 h-4 w-4" /> Nuevo Plan
             </Button>
           </div>
-
           {plansLoading ? (
             <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
           ) : habitPlans.length === 0 ? (
@@ -259,7 +290,7 @@ export default function PatientDetailPage() {
                       <Button variant="outline" size="sm" onClick={() => setAddTaskDialog({ open: true, planId: plan.id })}>
                         <Plus className="mr-1 h-3.5 w-3.5" /> Agregar Tarea
                       </Button>
-                      <Button variant="outline" size="sm" 
+                      <Button variant="outline" size="sm"
                         onClick={() => navigate(`/patients/${patientId}/plans/${plan.id}/rules`)}>
                         <Activity className="mr-1 h-3.5 w-3.5" /> Ver Reglas
                       </Button>
@@ -270,6 +301,7 @@ export default function PatientDetailPage() {
                           <TableRow>
                             <TableHead>Tarea</TableHead>
                             <TableHead>Descripción</TableHead>
+                            <TableHead>Prioridad</TableHead>
                             <TableHead className="text-right">Acciones</TableHead>
                           </TableRow>
                         </TableHeader>
@@ -278,6 +310,15 @@ export default function PatientDetailPage() {
                             <TableRow key={task.id}>
                               <TableCell className="font-medium">{task.name}</TableCell>
                               <TableCell>{task.description}</TableCell>
+                              <TableCell>
+                                <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                                  task.priority === "ALTA" ? "bg-red-100 text-red-700"
+                                  : task.priority === "MEDIA" ? "bg-yellow-100 text-yellow-700"
+                                  : "bg-green-100 text-green-700"
+                                }`}>
+                                  {task.priority ?? "—"}
+                                </span>
+                              </TableCell>
                               <TableCell className="text-right">
                                 <Button
                                   variant="ghost"
@@ -299,7 +340,6 @@ export default function PatientDetailPage() {
               </Card>
             ))
           )}
-
           <CreateHabitPlanDialog open={habitPlanDialog} onOpenChange={setHabitPlanDialog} patientId={patientId} />
           <AddTaskDialog
             open={addTaskDialog.open}
@@ -308,6 +348,94 @@ export default function PatientDetailPage() {
             planId={addTaskDialog.planId}
           />
         </TabsContent>
+
+        {/* ── Consentimientos ── */}
+        <TabsContent value="consents" className="space-y-4 mt-4">
+          {consentsLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : consents.length === 0 ? (
+            <Card>
+              <CardContent className="pt-6 text-center text-muted-foreground">
+                No hay consentimientos registrados.
+              </CardContent>
+            </Card>
+          ) : (
+            consents.map((consent) => (
+              <Card key={consent.id}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-base">{consent.consentTemplate.titulo}</CardTitle>
+                      <p className="text-xs text-muted-foreground mt-1">Versión {consent.consentTemplate.version}</p>
+                    </div>
+                    {consent.aceptado ? (
+                      <span className="text-sm text-green-600 font-medium">
+                        ✅ Aceptado — {consent.fechaAceptacion ? format(new Date(consent.fechaAceptacion), "dd/MM/yyyy HH:mm") : ""}
+                      </span>
+                    ) : (
+                      <Button size="sm" onClick={() => acceptConsent.mutate(consent.id)} disabled={acceptConsent.isPending}>
+                        Aceptar
+                      </Button>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">{consent.consentTemplate.contenido}</p>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+
+        {/* ── Tareas de Hoy ── */}
+        <TabsContent value="today-tasks" className="space-y-4 mt-4">
+          {tasksLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : todayTasks.length === 0 ? (
+            <Card>
+              <CardContent className="pt-6 text-center text-muted-foreground">
+                No hay tareas programadas para hoy.
+              </CardContent>
+            </Card>
+          ) : (
+            todayTasks.map((task) => {
+              const completed = todayCheckIn?.tasks?.some(
+                t => t.taskId === task.id && t.completed
+              ) ?? false;
+              return (
+                <Card key={task.id}>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-base">{task.name}</CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                          task.priority === "ALTA" ? "bg-red-100 text-red-700"
+                          : task.priority === "MEDIA" ? "bg-yellow-100 text-yellow-700"
+                          : "bg-green-100 text-green-700"
+                        }`}>
+                          {task.priority}
+                        </span>
+                        {completed ? (
+                          <span className="text-sm text-green-600 font-medium">✅ Registrada</span>
+                        ) : (
+                          <span className="text-sm text-yellow-600 font-medium">⏳ Pendiente</span>
+                        )}
+                      </div>
+                    </div>
+                  </CardHeader>
+                </Card>
+              );
+            })
+          )}
+        </TabsContent>
+
       </Tabs>
     </div>
   );
