@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
 import { toast } from "sonner";
 import { ChevronDown, ChevronUp, Loader2, RefreshCw, ShieldAlert } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +22,11 @@ interface Props {
 }
 
 const formatPct = (value: number) => `${Math.round(value)}%`;
-const formatDate = (value: string) => format(new Date(value), "dd/MM/yyyy");
+
+const formatDate = (value: string) => {
+  const [year, month, day] = value.split("-");
+  return `${day}/${month}/${year}`;
+};
 
 export function RiskLevelSection({ patientId }: Props) {
   const queryClient = useQueryClient();
@@ -38,20 +41,27 @@ export function RiskLevelSection({ patientId }: Props) {
     queryFn: () => riskLevelService.get(patientId),
     enabled: !!patientId,
     retry: false,
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
   const { data: history = [], isLoading: historyLoading } = useQuery({
     queryKey: ["riskLevelHistory", patientId],
     queryFn: () => riskLevelService.history(patientId),
     enabled: historyOpen,
+    staleTime: 0,
   });
 
   const evaluate = useMutation({
     mutationFn: () => riskLevelService.evaluate(patientId),
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Riesgo evaluado correctamente");
+      queryClient.setQueryData(["riskLevel", patientId], data);
       queryClient.invalidateQueries({ queryKey: ["riskLevel", patientId] });
       queryClient.invalidateQueries({ queryKey: ["riskLevelHistory", patientId] });
+    },
+    onError: () => {
+      toast.error("Error al evaluar el riesgo");
     },
   });
 
