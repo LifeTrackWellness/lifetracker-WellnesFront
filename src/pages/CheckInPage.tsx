@@ -330,46 +330,52 @@ export default function CheckInPage() {
       )}
 
       {/* PASO 3: Cierre */}
-      {step === "closing" && (
-        <div className="space-y-8 animate-in fade-in duration-500 text-center py-8">
-          {closingLoading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : closing ? (
-            <>
-              <div className="space-y-4">
-                <div className="flex items-center justify-center gap-3">
-                  <Flame className="h-10 w-10 text-destructive" />
-                  <span className="text-5xl font-extrabold text-foreground">
-                    {closing.streak}
-                  </span>
-                  <span className="text-lg text-muted-foreground font-medium">
-                    {closing.streak === 1 ? "día" : "días"}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground">Racha actual </p>
-              </div>
-
-              <Card className="bg-primary/5 border-primary/20">
-                <CardContent className="pt-6 pb-6">
-                  <p className="text-lg font-medium text-foreground leading-relaxed">
-                    {closing.message}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Button
-                onClick={() => navigate(`/patients/${patientId}`)}
-                className="w-full h-12 text-lg"
-                size="lg"
-              >
-                Volver al inicio
-              </Button>
-            </>
-          ) : null}
+  {step === "closing" && (
+    <div className="space-y-8 animate-in fade-in duration-500 text-center py-8">
+      {closingLoading ? (
+        <div className="flex justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-      )}
+      ) : closing ? (
+        <>
+          <div className="flex flex-col items-center gap-3">
+            <div className="relative flex items-center justify-center mb-2">
+              <div className="absolute w-28 h-28 rounded-full bg-orange-100 animate-pulse" />
+              <div className="absolute w-20 h-20 rounded-full bg-orange-200 animate-pulse delay-75" />
+              <Flame className="relative h-16 w-16 text-orange-500 drop-shadow-lg" />
+            </div>
+            <div className="flex items-end gap-2">
+              <span className="text-7xl font-extrabold text-foreground leading-none">
+                {closing.streak}
+              </span>
+              <span className="text-xl text-muted-foreground font-medium pb-2">
+                {closing.streak === 1 ? "día" : "días"}
+              </span>
+            </div>
+            <p className="text-base font-semibold text-orange-500 tracking-wide">
+              🔥 Racha actual
+            </p>
+          </div>
+
+          <Card className="bg-orange-50 border-orange-200">
+            <CardContent className="pt-6 pb-6">
+              <p className="text-lg font-medium text-foreground leading-relaxed">
+                {closing.message}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Button
+            onClick={() => navigate(`/patients/${patientId}`)}
+            className="w-full h-12 text-lg"
+            size="lg"
+          >
+            Volver al inicio
+          </Button>
+        </>
+      ) : null}
+    </div>
+  )}
 
       {/* Ya hizo check-in hoy */}
       {step === "already-done" && (
