@@ -13,8 +13,20 @@ import CheckInPage from "@/pages/CheckInPage";
 import CheckInHistoryPage from "@/pages/CheckInHistoryPage";
 import RiskLevelPanelPage from "@/pages/RiskLevelPanelPage";
 import AdherencePage from "@/pages/AdherencePage";
+import LoginPage from "@/pages/LoginPage";
+import RegisterPage from "@/pages/RegisterPage";
+import VerifyEmailPage from "@/pages/VerifyEmailPage";
+import { authService } from "@/services/authService";
 
 const queryClient = new QueryClient();
+
+// Componente que protege rutas — si no hay sesión, redirige al login
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  if (!authService.isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -22,21 +34,37 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AppLayout>
-          <Routes>
-            <Route path="/" element={<Navigate to="/patients" replace />} />
-            <Route path="/patients" element={<PatientListPage />} />
-            <Route path="/patients/inactive" element={<InactivePatientsPage />} />
-            <Route path="/patients/:id" element={<PatientDetailPage />} />
-            <Route path="/patients/:id/plans/:planId/rules" element={<PlanRulesPage />} />
-            <Route path="/patients/:id/check-in" element={<CheckInPage />} />
-            <Route path="/patients/:id/check-in/history" element={<CheckInHistoryPage />} />
-            <Route path="/risk-level" element={<RiskLevelPanelPage />} />
-            <Route path="*" element={<NotFound />} />
-            <Route path="/patients/:id/adherence" element={<AdherencePage />} />
+        <Routes>
 
-          </Routes>
-        </AppLayout>
+          {/* Rutas públicas — sin sidebar, sin autenticación */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+
+          {/* Rutas protegidas — requieren JWT válido */}
+          <Route
+            path="/*"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Routes>
+                    <Route path="/" element={<Navigate to="/patients" replace />} />
+                    <Route path="/patients" element={<PatientListPage />} />
+                    <Route path="/patients/inactive" element={<InactivePatientsPage />} />
+                    <Route path="/patients/:id" element={<PatientDetailPage />} />
+                    <Route path="/patients/:id/plans/:planId/rules" element={<PlanRulesPage />} />
+                    <Route path="/patients/:id/check-in" element={<CheckInPage />} />
+                    <Route path="/patients/:id/check-in/history" element={<CheckInHistoryPage />} />
+                    <Route path="/risk-level" element={<RiskLevelPanelPage />} />
+                    <Route path="/patients/:id/adherence" element={<AdherencePage />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
