@@ -25,7 +25,7 @@ export default function LoginPage() {
     try {
       const response = await authService.login(data as LoginData);
       if (response.role === "PROFESSIONAL") navigate("/patients");
-      else if (response.role === "PATIENT") navigate("/patient-home");
+      else if (response.role === "PATIENT") navigate("/patients/" + response.id + "/check-in");
       else navigate("/");
     } catch {
     } finally {

@@ -16,6 +16,7 @@ import AdherencePage from "@/pages/AdherencePage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import VerifyEmailPage from "@/pages/VerifyEmailPage";
+import ActivateAccountPage from "@/pages/ActivateAccountPage";
 import { authService } from "@/services/authService";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/activate" element={<ActivateAccountPage />} />
 
           {/* Rutas protegidas — requieren JWT válido */}
           <Route

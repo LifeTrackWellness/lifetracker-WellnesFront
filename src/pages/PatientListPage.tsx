@@ -8,10 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "@/components/StatusBadge";
 import { CreatePatientDialog } from "@/components/dialogs/CreatePatientDialog";
+import { CreatePatientAccountDialog } from "@/components/dialogs/CreatePatientAccountDialog";
 import { EditContactDialog } from "@/components/dialogs/EditContactDialog";
 import { DeactivatePatientDialog } from "@/components/dialogs/DeactivatePatientDialog";
-import { Plus, Search, Eye, Pencil, UserMinus, Loader2 } from "lucide-react";
+import { Plus, Search, Eye, Pencil, UserMinus, Loader2, UserPlus } from "lucide-react";
 import type { PatientListDTO } from "@/types";
+import { authService } from "@/services/authService";
 
 export default function PatientListPage() {
   const navigate = useNavigate();
@@ -19,8 +21,12 @@ export default function PatientListPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [conditionFilter, setConditionFilter] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
+  const [createAccountOpen, setCreateAccountOpen] = useState(false);
   const [editContact, setEditContact] = useState<{ open: boolean; patient: PatientListDTO | null }>({ open: false, patient: null });
   const [deactivate, setDeactivate] = useState<{ open: boolean; patientId: number | null }>({ open: false, patientId: null });
+
+  const currentUser = authService.getCurrentUser();
+  const professionalId = currentUser?.id ?? 0;
 
   const { data: patients = [], isLoading } = useQuery({
   queryKey: ["patients", "list", search, statusFilter, conditionFilter],
@@ -35,9 +41,14 @@ export default function PatientListPage() {
           <h2 className="text-2xl font-bold text-foreground">Pacientes</h2>
           <p className="text-muted-foreground">Gestión de pacientes activos</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" /> Nuevo Paciente
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setCreateOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" /> Nuevo Paciente
+          </Button>
+          <Button variant="outline" onClick={() => setCreateAccountOpen(true)}>
+            <UserPlus className="mr-2 h-4 w-4" /> Crear cuenta
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-3">
@@ -118,6 +129,11 @@ export default function PatientListPage() {
       </div>
 
       <CreatePatientDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <CreatePatientAccountDialog
+        open={createAccountOpen}
+        onOpenChange={setCreateAccountOpen}
+        professionalId={professionalId}
+      />
       <EditContactDialog
         open={editContact.open}
         onOpenChange={(open) => setEditContact({ ...editContact, open })}

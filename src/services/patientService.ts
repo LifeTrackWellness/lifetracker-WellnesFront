@@ -32,4 +32,15 @@ export const patientService = {
 
   reactivate: (id: number, data?: { name?: string; lastName?: string; email?: string; phoneNumber?: string }) =>
     api.patch<Patient>(`/api/patients/${id}/reactivate`, data || {}).then((r) => r.data),
+
+    // Crear cuenta de paciente con email — el backend envía credenciales por correo
+    createAccount: (professionalId: number, data: { name: string; lastName: string; email: string; identityDocument: string; documentType: string }) =>
+  api.post<Patient>(`/api/patients/by-professional/${professionalId}`, data).then((r) => r.data),
+
+
+  // Listar pacientes vinculados al profesional autenticado
+  listByProfessional: (professionalId: number) =>
+    api
+      .get<Patient[]>(`/api/patients/by-professional/${professionalId}`)
+      .then((r) => r.data),
 };
