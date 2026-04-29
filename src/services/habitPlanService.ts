@@ -20,7 +20,18 @@ export const habitPlanService = {
   deactivate: (patientId: number, planId: number) =>
     api.patch<HabitPlan>(`/api/patients/${patientId}/habit-plans/${planId}/deactivate`).then((r) => r.data),
 
-  addTask: (patientId: number, planId: number, data: { name: string; description: string }) =>
+  addTask: (
+    patientId: number,
+    planId: number,
+    data: {
+      name: string;
+      description: string;
+      priority?: "ALTA" | "MEDIA" | "BAJA";
+      mandatory?: boolean;
+      weeklyGoal?: number;
+      specificDays?: string[];
+    }
+  ) =>
     api.post<HabitTask>(`/api/patients/${patientId}/habit-plans/${planId}/tasks`, data).then((r) => r.data),
 
   deleteTask: (patientId: number, planId: number, taskId: number) =>
