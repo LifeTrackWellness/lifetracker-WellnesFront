@@ -60,12 +60,12 @@ const App = () => (
               <ProtectedRoute allowedRole="PATIENT">
                 <PatientLayout>
                   <Routes>
-                    <Route path="/" element={<Navigate to="/patient/home" replace />} />
-                    <Route path="/home" element={<PatientHomePage />} />
-                    <Route path="/check-in" element={<PatientCheckInPage />} />
-                    <Route path="/history" element={<PatientHistoryPage />} />
-                    <Route path="/plan" element={<PatientPlanPage />} />
-                    <Route path="/consents" element={<PatientConsentsPage />} />
+                    <Route index element={<Navigate to="home" replace />} />
+                    <Route path="home" element={<PatientHomePage />} />
+                    <Route path="check-in" element={<PatientCheckInPage />} />
+                    <Route path="history" element={<PatientHistoryPage />} />
+                    <Route path="plan" element={<PatientPlanPage />} />
+                    <Route path="consents" element={<PatientConsentsPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </PatientLayout>
