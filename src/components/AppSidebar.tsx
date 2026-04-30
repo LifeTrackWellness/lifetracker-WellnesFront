@@ -1,6 +1,6 @@
-import { Users, UserX, Activity, ShieldAlert } from "lucide-react";
+import { Users, UserX, ShieldAlert, Activity, LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -11,8 +11,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { authService } from "@/services/authService";
+import { Button } from "@/components/ui/button";
 
 const navItems = [
   { title: "Pacientes", url: "/patients", icon: Users },
@@ -24,6 +27,12 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    authService.logout();
+    navigate("/login");
+  };
 
   return (
     <Sidebar collapsible="icon">
@@ -37,6 +46,7 @@ export function AppSidebar() {
           )}
         </div>
       </SidebarHeader>
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Gestión</SidebarGroupLabel>
@@ -61,6 +71,17 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter className="p-3">
+        <Button
+          variant="ghost"
+          onClick={handleLogout}
+          className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+        >
+          <LogOut className="h-4 w-4" />
+          {!collapsed && <span>Cerrar sesión</span>}
+        </Button>
+      </SidebarFooter>
     </Sidebar>
   );
 }
