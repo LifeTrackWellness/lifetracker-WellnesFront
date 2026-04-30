@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import AppLayout from "@/components/AppLayout";
+import PatientLayout from "@/components/PatientLayout";
 import PatientListPage from "@/pages/PatientListPage";
 import PatientDetailPage from "@/pages/PatientDetailPage";
 import InactivePatientsPage from "@/pages/InactivePatientsPage";
@@ -17,15 +18,25 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import VerifyEmailPage from "@/pages/VerifyEmailPage";
 import ActivateAccountPage from "@/pages/ActivateAccountPage";
+import PatientHomePage from "@/pages/patient/PatientHomePage";
+import PatientCheckInPage from "@/pages/patient/PatientCheckInPage";
+import PatientHistoryPage from "@/pages/patient/PatientHistoryPage";
+import PatientPlanPage from "@/pages/patient/PatientPlanPage";
+import PatientConsentsPage from "@/pages/patient/PatientConsentsPage";
 import { authService } from "@/services/authService";
 
 const queryClient = new QueryClient();
 
-// Componente que protege rutas — si no hay sesión, redirige al login
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  if (!authService.isAuthenticated()) {
-    return <Navigate to="/login" replace />;
-  }
+const ProtectedRoute = ({
+  children,
+  allowedRole,
+}: {
+  children: React.ReactNode;
+  allowedRole: "PROFESSIONAL" | "PATIENT";
+}) => {
+  const user = authService.getCurrentUser();
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role !== allowedRole) return <Navigate to="/login" replace />;
   return <>{children}</>;
 };
 
@@ -36,18 +47,37 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-
-          {/* Rutas públicas — sin sidebar, sin autenticación */}
+          {/* Públicas */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/activate" element={<ActivateAccountPage />} />
 
-          {/* Rutas protegidas — requieren JWT válido */}
+          {/* Rutas del PACIENTE */}
+          <Route
+            path="/patient/*"
+            element={
+              <ProtectedRoute allowedRole="PATIENT">
+                <PatientLayout>
+                  <Routes>
+                    <Route index element={<Navigate to="home" replace />} />
+                    <Route path="home" element={<PatientHomePage />} />
+                    <Route path="check-in" element={<PatientCheckInPage />} />
+                    <Route path="history" element={<PatientHistoryPage />} />
+                    <Route path="plan" element={<PatientPlanPage />} />
+                    <Route path="consents" element={<PatientConsentsPage />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </PatientLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rutas del PROFESIONAL */}
           <Route
             path="/*"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRole="PROFESSIONAL">
                 <AppLayout>
                   <Routes>
                     <Route path="/" element={<Navigate to="/patients" replace />} />
@@ -65,7 +95,6 @@ const App = () => (
               </ProtectedRoute>
             }
           />
-
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

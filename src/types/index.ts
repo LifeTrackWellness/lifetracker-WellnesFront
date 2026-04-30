@@ -54,10 +54,16 @@ export interface PatientListDTO {
   healthStatus?: HealthStatus;
 }
 
+export type TaskPriority = "ALTA" | "MEDIA" | "BAJA";
+
 export interface HabitTask {
   id: number;
   name: string;
   description: string;
+  priority?: TaskPriority;
+  mandatory?: boolean;
+  weeklyGoal?: number | null;
+  specificDays?: string[];
   createdAt: string;
 }
 

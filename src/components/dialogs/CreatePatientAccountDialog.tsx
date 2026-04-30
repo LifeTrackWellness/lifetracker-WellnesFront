@@ -35,6 +35,7 @@ const initialForm = {
   email: "",
   identityDocument: "",
   documentType: "CEDULA",
+  phoneNumber: "",
 };
 
 export function CreatePatientAccountDialog({ open, onOpenChange, professionalId }: Props) {
@@ -68,7 +69,7 @@ export function CreatePatientAccountDialog({ open, onOpenChange, professionalId 
       !form.email.trim() ||
       !form.identityDocument.trim()
     ) {
-      toast.error("Completa todos los campos.");
+      toast.error("Completa todos los campos obligatorios.");
       return;
     }
     mutation.mutate();
@@ -78,7 +79,7 @@ export function CreatePatientAccountDialog({ open, onOpenChange, professionalId 
     <Dialog open={open} onOpenChange={(o) => { if (!o) setForm(initialForm); onOpenChange(o); }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Crear cuenta de paciente</DialogTitle>
+          <DialogTitle>Nuevo Paciente</DialogTitle>
           <DialogDescription>
             El paciente recibirá un email con sus credenciales de acceso temporales
           </DialogDescription>
@@ -87,7 +88,7 @@ export function CreatePatientAccountDialog({ open, onOpenChange, professionalId 
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="account-name">Nombre</Label>
+              <Label htmlFor="account-name">Nombre *</Label>
               <Input
                 id="account-name"
                 value={form.name}
@@ -97,7 +98,7 @@ export function CreatePatientAccountDialog({ open, onOpenChange, professionalId 
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="account-lastName">Apellido</Label>
+              <Label htmlFor="account-lastName">Apellido *</Label>
               <Input
                 id="account-lastName"
                 value={form.lastName}
@@ -109,7 +110,7 @@ export function CreatePatientAccountDialog({ open, onOpenChange, professionalId 
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="account-documentType">Tipo de documento</Label>
+              <Label htmlFor="account-documentType">Tipo de documento *</Label>
               <Select
                 value={form.documentType}
                 onValueChange={(v) => setForm({ ...form, documentType: v })}
@@ -124,7 +125,7 @@ export function CreatePatientAccountDialog({ open, onOpenChange, professionalId 
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="account-document">Número de documento</Label>
+              <Label htmlFor="account-document">Número de documento *</Label>
               <Input
                 id="account-document"
                 value={form.identityDocument}
@@ -135,7 +136,17 @@ export function CreatePatientAccountDialog({ open, onOpenChange, professionalId 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="account-email">Email</Label>
+            <Label htmlFor="account-phone">Teléfono</Label>
+            <Input
+              id="account-phone"
+              value={form.phoneNumber}
+              onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+              placeholder="3001234567"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="account-email">Email *</Label>
             <Input
               id="account-email"
               type="email"
