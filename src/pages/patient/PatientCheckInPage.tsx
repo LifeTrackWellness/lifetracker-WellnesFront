@@ -57,7 +57,6 @@ export default function PatientCheckInPage() {
       queryClient.invalidateQueries({ queryKey: ["patient-me-closing"] });
       setStep("closing");
     },
-  
     onError: async (error: any) => {
       if (error?.response?.status === 400) {
         try {
