@@ -21,6 +21,7 @@ import { RiskLevelSection } from "@/components/risk-level/RiskLevelSection";
 import { consentService } from "@/services/consentService";
 import { checkInService } from "@/services/checkInService";
 
+
 export default function PatientDetailPage() {
   const { id } = useParams<{ id: string }>();
   const patientId = Number(id);
@@ -152,7 +153,13 @@ export default function PatientDetailPage() {
               </Button>
                <Button variant="outline" onClick={() => navigate(`/patients/${patientId}/adherence`)} className="gap-2">
                   <Activity className="h-4 w-4" /> Métricas
+
+
                 </Button>
+
+              <Button variant="outline" onClick={() => navigate(`/patients/${patientId}/progress-report`)} className="gap-2">
+                <FileText className="h-4 w-4" /> Reporte de Progreso
+              </Button>
               
               <StatusBadge status={patient.status} />
             </div>

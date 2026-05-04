@@ -17,7 +17,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import VerifyEmailPage from "@/pages/VerifyEmailPage";
 import { authService } from "@/services/authService";
-
+import ProgressReportPage from "@/pages/ProgressReportPage";
 const queryClient = new QueryClient();
 
 // Componente que protege rutas — si no hay sesión, redirige al login
@@ -57,6 +57,7 @@ const App = () => (
                     <Route path="/patients/:id/check-in/history" element={<CheckInHistoryPage />} />
                     <Route path="/risk-level" element={<RiskLevelPanelPage />} />
                     <Route path="/patients/:id/adherence" element={<AdherencePage />} />
+                    <Route path="/patients/:id/progress-report" element={<ProgressReportPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </AppLayout>
