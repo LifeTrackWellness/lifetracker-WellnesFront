@@ -24,7 +24,7 @@ import PatientHistoryPage from "@/pages/patient/PatientHistoryPage";
 import PatientPlanPage from "@/pages/patient/PatientPlanPage";
 import PatientConsentsPage from "@/pages/patient/PatientConsentsPage";
 import { authService } from "@/services/authService";
-
+import ProgressReportPage from "@/pages/ProgressReportPage";
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({
@@ -89,6 +89,7 @@ const App = () => (
                     <Route path="/patients/:id/check-in/history" element={<CheckInHistoryPage />} />
                     <Route path="/risk-level" element={<RiskLevelPanelPage />} />
                     <Route path="/patients/:id/adherence" element={<AdherencePage />} />
+                    <Route path="/patients/:id/progress-report" element={<ProgressReportPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </AppLayout>
