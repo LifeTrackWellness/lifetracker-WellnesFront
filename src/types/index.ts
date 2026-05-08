@@ -102,6 +102,32 @@ export interface PlanRule {
   active: boolean;
 }
 
+export interface EvaluationLog {
+  id: number;
+  planRule: {
+    id: number;
+    umbralPersonalizado: number;
+    active: boolean;
+    ruleTemplate: {
+      id: number;
+      name: string;
+      description: string;
+      umbralDefault: number;
+      umbralMin: number;
+      umbralMax: number;
+    };
+  };
+  patient: {
+    id: number;
+    name: string;
+    lastName: string;
+  };
+  evaluationDate: string;
+  triggered: boolean;
+  complianceValue: number;
+  createdAt: string;
+}
+
 export type RiskLevel = "VERDE" | "AMARILLO" | "ROJO";
 
 export interface RiskLevelInfo {

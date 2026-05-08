@@ -1,5 +1,5 @@
 import api from "@/lib/axiosConfig";
-import type { PlanRule } from "@/types";
+import type { PlanRule, EvaluationLog } from "@/types";
 
 export const planRuleService = {
   list: (planId: number) =>
@@ -10,4 +10,7 @@ export const planRuleService = {
 
   save: (planId: number, rules: PlanRule[]) =>
     api.post<PlanRule[]>(`/api/plans/${planId}/rules/save`, rules).then((r) => r.data),
+
+  getEvaluationLog: (planId: number) =>
+    api.get<EvaluationLog[]>(`/api/plans/${planId}/rules/evaluation-log`).then((r) => r.data),
 };

@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { ruleTemplateService } from "@/services/ruleTemplateService";
 import { planRuleService } from "@/services/planRuleService";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ArrowLeft, Loader2, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import type { RuleTemplate, PlanRule } from "@/types";
 
@@ -153,6 +157,87 @@ export default function PlanRulesPage() {
       <Button onClick={handleSave} className="w-full">
         Guardar configuración
       </Button>
+
+      <EvaluationLogSection planId={planIdNum} />
     </div>
+  );
+}
+
+function EvaluationLogSection({ planId }: { planId: number }) {
+  const [open, setOpen] = useState(false);
+
+  const { data: logs = [], isLoading, isError } = useQuery({
+    queryKey: ["planRuleEvaluationLog", planId],
+    queryFn: () => planRuleService.getEvaluationLog(planId),
+    enabled: !!planId,
+  });
+
+  useEffect(() => {
+    if (isError) toast.error("Error al cargar el historial de evaluaciones");
+  }, [isError]);
+
+  const sorted = [...logs].sort(
+    (a, b) => new Date(b.evaluationDate).getTime() - new Date(a.evaluationDate).getTime()
+  );
+
+  return (
+    <Card>
+      <Collapsible open={open} onOpenChange={setOpen}>
+        <CollapsibleTrigger asChild>
+          <CardHeader className="cursor-pointer flex-row items-center justify-between">
+            <CardTitle>Historial de evaluaciones</CardTitle>
+            <ChevronDown
+              className={`h-5 w-5 transition-transform ${open ? "rotate-180" : ""}`}
+            />
+          </CardHeader>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : sorted.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-4 text-center">
+                No hay evaluaciones registradas aún
+              </p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead>Regla</TableHead>
+                    <TableHead>Cumplimiento</TableHead>
+                    <TableHead>Estado</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sorted.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell>
+                        {format(new Date(log.evaluationDate), "dd/MM/yyyy")}
+                      </TableCell>
+                      <TableCell>{log.planRule.ruleTemplate.name}</TableCell>
+                      <TableCell>{log.complianceValue}%</TableCell>
+                      <TableCell>
+                        {log.triggered ? (
+                          <Badge className="bg-status-critical/15 text-status-critical border-status-critical/30 border">
+                            Disparada 🔴
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-status-active/15 text-status-active border-status-active/30 border">
+                            No disparada
+                          </Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </CollapsibleContent>
+      </Collapsible>
+    </Card>
   );
 }
