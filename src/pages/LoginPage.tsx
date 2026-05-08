@@ -26,7 +26,7 @@ function ContactModal({ onClose }: { onClose: () => void }) {
     {
       name: "Andrea Marín Díaz",
       role: "Desarrolladora FullStack",
-      email: "andrea.marind@udea.edu.co",
+      email: "andrea.marind.1@gmail.com",
       github: "https://github.com/marin-Diaz",
       githubUser: "marin-Diaz",
     },
