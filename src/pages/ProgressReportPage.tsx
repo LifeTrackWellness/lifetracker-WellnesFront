@@ -60,9 +60,13 @@ function formatShortDate(dateStr: string) {
 
 // ─── Componente principal ────────────────────────────────────────────────────
 
-export default function ProgressReportPage() {
+interface Props {
+  overridePatientId?: number;
+}
+
+  export default function ProgressReportPage(props: Props = {}) {
   const { id } = useParams<{ id: string }>();
-  const patientId = Number(id);
+  const patientId = props.overridePatientId ?? Number(id);
   const reportRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const currentUser = authService.getCurrentUser();
@@ -167,35 +171,34 @@ export default function ProgressReportPage() {
   }
 `}</style>
 
-      {/* Botón imprimir */}
-      <div
-        className="no-print"
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "1rem",
-          padding: "0 1rem",
-        }}
-      >
-        <button
-          onClick={handlePrint}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            padding: "0.6rem 1.25rem",
-            background: "hsl(199, 89%, 38%)",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontSize: "0.875rem",
-            fontWeight: 500,
-          }}
-        >
-          <Printer size={16} /> Imprimir / Exportar PDF
-        </button>
-      </div>
+      {/* Botón imprimir y volver */}
+      <div className="no-print" style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem", padding: "0 1rem" }}>
+  <button
+    onClick={() => window.history.back()}
+    style={{
+      display: "flex", alignItems: "center", gap: "0.5rem",
+      padding: "0.6rem 1.25rem",
+      background: "transparent", color: "hsl(199, 89%, 38%)",
+      border: "1px solid hsl(199, 89%, 38%)", borderRadius: "8px",
+      cursor: "pointer", fontSize: "0.875rem", fontWeight: 500,
+    }}
+  >
+    ← Volver
+  </button>
+
+  <button
+    onClick={handlePrint}
+    style={{
+      display: "flex", alignItems: "center", gap: "0.5rem",
+      padding: "0.6rem 1.25rem",
+      background: "hsl(199, 89%, 38%)", color: "white",
+      border: "none", borderRadius: "8px", cursor: "pointer",
+      fontSize: "0.875rem", fontWeight: 500,
+    }}
+  >
+    <Printer size={16} /> Imprimir / Exportar PDF
+  </button>
+</div>
 
       {/* Reporte */}
       <div

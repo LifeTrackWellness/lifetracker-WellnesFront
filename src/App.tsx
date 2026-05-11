@@ -24,7 +24,9 @@ import PatientHistoryPage from "@/pages/patient/PatientHistoryPage";
 import PatientPlanPage from "@/pages/patient/PatientPlanPage";
 import PatientConsentsPage from "@/pages/patient/PatientConsentsPage";
 import { authService } from "@/services/authService";
+import PatientProgressReportPage from "@/pages/patient/PatientProgressReportPage";
 import ProgressReportPage from "@/pages/ProgressReportPage";
+
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({
@@ -52,6 +54,7 @@ const App = () => (
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/activate" element={<ActivateAccountPage />} />
+          <Route path="/patient/progress-report" element={<PatientProgressReportPage />} />
 
           {/* Rutas del PACIENTE */}
           <Route

@@ -1,14 +1,17 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { Home, CheckCircle2, Calendar, ClipboardList, LogOut, FileText } from "lucide-react";
 import { authService } from "@/services/authService";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Home, CheckCircle2, Calendar, ClipboardList, LogOut, FileText, BarChart2 } from "lucide-react";
+
+
 
 const navItems = [
   { to: "/patient/home", label: "Inicio", icon: Home },
   { to: "/patient/check-in", label: "Check-in", icon: CheckCircle2 },
   { to: "/patient/history", label: "Historial", icon: Calendar },
   { to: "/patient/plan", label: "Mi plan", icon: ClipboardList },
+  { to: "/patient/progress-report", label: "Mi progreso", icon: BarChart2 },
 ];
 
 export default function PatientLayout({ children }: { children: React.ReactNode }) {
@@ -64,7 +67,7 @@ export default function PatientLayout({ children }: { children: React.ReactNode 
 
       {/* Bottom navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t bg-card shadow-lg">
-        <div className="grid grid-cols-4 max-w-2xl mx-auto">
+        <div className="grid grid-cols-5 max-w-2xl mx-auto">
           {navItems.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
