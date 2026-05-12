@@ -26,6 +26,7 @@ import PatientConsentsPage from "@/pages/patient/PatientConsentsPage";
 import { authService } from "@/services/authService";
 import PatientProgressReportPage from "@/pages/patient/PatientProgressReportPage";
 import ProgressReportPage from "@/pages/ProgressReportPage";
+import AlertsPage from "@/pages/AlertsPage";
 
 const queryClient = new QueryClient();
 
@@ -55,7 +56,8 @@ const App = () => (
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/activate" element={<ActivateAccountPage />} />
           <Route path="/patient/progress-report" element={<PatientProgressReportPage />} />
-
+          <Route path="/alerts" element={<AlertsPage />} />
+          <Route path="/alerts" element={<AlertsPage />} />
           {/* Rutas del PACIENTE */}
           <Route
             path="/patient/*"
