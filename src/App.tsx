@@ -27,6 +27,7 @@ import { authService } from "@/services/authService";
 import PatientProgressReportPage from "@/pages/patient/PatientProgressReportPage";
 import ProgressReportPage from "@/pages/ProgressReportPage";
 import AlertsPage from "@/pages/AlertsPage";
+import DashboardPage from "@/pages/DashboardPage";
 
 const queryClient = new QueryClient();
 
@@ -57,7 +58,7 @@ const App = () => (
           <Route path="/activate" element={<ActivateAccountPage />} />
           <Route path="/patient/progress-report" element={<PatientProgressReportPage />} />
           <Route path="/alerts" element={<AlertsPage />} />
-          <Route path="/alerts" element={<AlertsPage />} />
+
           {/* Rutas del PACIENTE */}
           <Route
             path="/patient/*"
@@ -85,7 +86,8 @@ const App = () => (
               <ProtectedRoute allowedRole="PROFESSIONAL">
                 <AppLayout>
                   <Routes>
-                    <Route path="/" element={<Navigate to="/patients" replace />} />
+                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                    <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/patients" element={<PatientListPage />} />
                     <Route path="/patients/inactive" element={<InactivePatientsPage />} />
                     <Route path="/patients/:id" element={<PatientDetailPage />} />
