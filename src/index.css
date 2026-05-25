@@ -135,3 +135,20 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  .no-print { display: none !important; }
+  #patient-header { display: none !important; }
+  #patient-nav { display: none !important; }
+  .print-header { display: flex !important; }
+  .print-footer { display: block !important; }
+  .print-checkbox { display: block !important; }
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  html, body { height: auto !important; overflow: visible !important; }
+  ::-webkit-scrollbar { display: none !important; }
+  @page { margin: 1.5cm; size: A4; }
+}
