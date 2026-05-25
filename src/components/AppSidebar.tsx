@@ -1,4 +1,4 @@
-import { Users, UserX, ShieldAlert, Activity, LogOut, Bell, LayoutDashboard } from "lucide-react";
+import { Users, UserX, ShieldAlert, Activity, LogOut, Bell, LayoutDashboard, Moon, Sun } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -15,9 +15,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { authService } from "@/services/authService";
-import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { alertService } from "@/services/alertService";
+import { useDarkMode } from "@/hooks/useDarkMode";
 
 const navItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -32,6 +32,8 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const navigate = useNavigate();
+  const { isDark, toggle } = useDarkMode("professional");
+  const user = authService.getCurrentUser();
 
   const handleLogout = () => {
     authService.logout();
@@ -95,15 +97,39 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-3">
-        <Button
-          variant="ghost"
-          onClick={handleLogout}
-          className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-        >
-          <LogOut className="h-4 w-4" />
-          {!collapsed && <span>Cerrar sesión</span>}
-        </Button>
+      <SidebarFooter className="p-3 border-t border-sidebar-border">
+        {!collapsed && user && (
+          <div className="px-2 py-1 mb-2">
+            <p className="text-xs font-medium text-sidebar-foreground truncate">
+              {user.name} {user.lastName}
+            </p>
+            <p className="text-xs text-sidebar-foreground/60 truncate">
+              {user.email}
+            </p>
+          </div>
+        )}
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={toggle}
+              className="hover:bg-sidebar-accent/50 cursor-pointer text-sidebar-foreground/80 hover:text-sidebar-foreground"
+            >
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {!collapsed && (
+                <span>{isDark ? "Modo claro" : "Modo oscuro"}</span>
+              )}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={handleLogout}
+              className="hover:bg-sidebar-accent/50 cursor-pointer text-sidebar-foreground/80 hover:text-sidebar-foreground"
+            >
+              <LogOut className="h-4 w-4" />
+              {!collapsed && <span>Cerrar sesión</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );
