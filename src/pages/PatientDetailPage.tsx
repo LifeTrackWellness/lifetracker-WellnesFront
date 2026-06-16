@@ -21,7 +21,6 @@ import { RiskLevelSection } from "@/components/risk-level/RiskLevelSection";
 import { consentService } from "@/services/consentService";
 import { checkInService } from "@/services/checkInService";
 
-
 export default function PatientDetailPage() {
   const { id } = useParams<{ id: string }>();
   const patientId = Number(id);
@@ -94,14 +93,6 @@ export default function PatientDetailPage() {
     },
   });
 
-  const acceptConsent = useMutation({
-    mutationFn: (consentId: number) => consentService.accept(patientId, consentId),
-    onSuccess: () => {
-      toast.success("Consentimiento aceptado");
-      queryClient.invalidateQueries({ queryKey: ["consents", patientId] });
-    },
-  });
-
   const togglePlan = (planId: number) => {
     setExpandedPlans((prev) => {
       const next = new Set(prev);
@@ -151,16 +142,12 @@ export default function PatientDetailPage() {
               <Button variant="outline" onClick={() => navigate(`/patients/${patientId}/check-in/history`)} className="gap-2">
                 <History className="h-4 w-4" /> Historial
               </Button>
-               <Button variant="outline" onClick={() => navigate(`/patients/${patientId}/adherence`)} className="gap-2">
-                  <Activity className="h-4 w-4" /> Métricas
-
-
-                </Button>
-
+              <Button variant="outline" onClick={() => navigate(`/patients/${patientId}/adherence`)} className="gap-2">
+                <Activity className="h-4 w-4" /> Métricas
+              </Button>
               <Button variant="outline" onClick={() => navigate(`/patients/${patientId}/progress-report`)} className="gap-2">
                 <FileText className="h-4 w-4" /> Reporte de Progreso
               </Button>
-              
               <StatusBadge status={patient.status} />
             </div>
           </div>
@@ -382,9 +369,9 @@ export default function PatientDetailPage() {
                         ✅ Aceptado — {consent.fechaAceptacion ? format(new Date(consent.fechaAceptacion), "dd/MM/yyyy HH:mm") : ""}
                       </span>
                     ) : (
-                      <Button size="sm" onClick={() => acceptConsent.mutate(consent.id)} disabled={acceptConsent.isPending}>
-                        Aceptar
-                      </Button>
+                      <span className="text-sm text-yellow-600 font-medium">
+                        ⏳ Pendiente de aceptación del paciente
+                      </span>
                     )}
                   </div>
                 </CardHeader>

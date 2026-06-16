@@ -909,8 +909,9 @@ interface Props {
                   fontWeight: 500,
                 }}
               >
-                <Plus size={14} /> Agregar
-              </button>
+                {!props.overridePatientId && (
+  <button>+ Agregar</button>
+)}
             </div>
 
             {showConclusionForm && (
